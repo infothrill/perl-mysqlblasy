@@ -9,17 +9,18 @@ unless (defined $version || length($version) > 0 ) {
 print "Using version $version\n";
 die "Die mysqlblasy-$version/ already exists.\n" if (-d "mysqlblasy-$version/");
 
-print `cp -ax mysqlblasy mysqlblasy-$version`;
+print `rm -rf dist/mysqlblasy-$version`;
+print `mkdir -p dist/mysqlblasy-$version`;
+print `cp CHANGES dist/mysqlblasy-$version/`;
+print `cp *.sample dist/mysqlblasy-$version/`;
+print `cp LICENSE dist/mysqlblasy-$version/`;
+print `cp mysqlblasy.pl dist/mysqlblasy-$version/`;
+print `cp README dist/mysqlblasy-$version/`;
+print `cp TODO dist/mysqlblasy-$version/`;
+print `chmod 755 dist/mysqlblasy-$version/mysqlblasy.pl`;
 
-print `rm -rf mysqlblasy-$version/.svn/`;
-print `rm -rf mysqlblasy-$version/.cvsignore`;
-print `rm -rf mysqlblasy-$version/ChangeLog`;
-print `rm -rf mysqlblasy-$version/*~`;
-print `rm -rf mysqlblasy-$version/*.bak`;
-print `chmod 755 mysqlblasy-$version/mysqlblasy.pl`;
-print `pod2html --noindex mysqlblasy-$version/mysqlblasy.pl > mysqlblasy-$version/mysqlblasy.pod.html`;
+print `cd dist && pod2html --noindex mysqlblasy-$version/mysqlblasy.pl > mysqlblasy-$version/mysqlblasy.pod.html`;
 
-print `tar cvzf mysqlblasy-$version.tgz mysqlblasy-$version/`;
-print `rm -rf mysqlblasy-$version/`;
+print `cd dist && tar cvzf mysqlblasy-$version.tgz mysqlblasy-$version/`;
 
 print "Tarball is: mysqlblasy-$version.tgz\n";
