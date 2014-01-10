@@ -1,0 +1,55 @@
+OVERVIEW
+--------
+mysqlblasy is a perl script for automatic silent mysql backups.
+See 'mysqlblasy --help' for more information.
+
+FEATURES
+--------
+* backup rotation to avoid disc overflow
+* dump some or all databases from a database instance
+* compress dumps (using gzip,bzip2,zip,tar)
+* optimize tables
+* syslog facility (only on unix-like system, not win32)
+* unix style output (loglevels, errors to stderr)
+* security: no shell on external commands!
+* NO root privileges required
+* NO external dependencies except Perl and MySQL
+* designed for automation (for example cron)
+
+DOCUMENTATION
+-------------
+run `perldoc myqlblasy.pl`
+
+REQUIREMENTS
+------------
+* Perl 5.6.1
+* MySQL >= 3
+
+INSTALL
+-------
+Simply drop the script where you want it to be and create a config file
+(usually $HOME/.mysqlblasyrc)
+
+NOTE
+----
+This tool is only actively supported for Perl version > 5.8.3
+
+OPERATING SYSTEMS
+-----------------
+mysqlblasy has been tested by myself or other people on the following platforms:
+- Linux >= 2.2 (Debian/Ubuntu)
+- Mac OS X >= 10.2 (mysql from fink.sf.net)
+- Windows 2003
+
+COMPETITION
+-----------
+similar tools:
+* http://www.mswanson.com/mybackup/
+* http://freshmeat.net/projects/mysqlbackup/
+* http://mysql-cbn.sourceforge.net/
+* http://dev.mysql.com/doc/mysql/en/mysqlhotcopy.html
+anything I missed?
+
+LICENSE
+-------
+see LICENSE

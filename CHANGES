@@ -1,0 +1,61 @@
+version 0.8 (October 2008)
+--------------------------
+- don't require Archive::Zip
++ added option 'optimize_tables = 1' which will execute the "OPTIMIZE TABLE"
+  statement on every dumped table AFTER dumping. Default is off.
+
+version 0.73 (August 2007)
+----------------------
++ added support for Win32 platform (patch by jessica dot blackburn [at]
+  gxs dot com)
+
+version 0.72 (Sep 2006)
+----------------------
+- minor fixes, bumped version number
+
+version 0.7 (Sep 2006)
+----------------------
++ new config option 'defaults-extra-file' which can be used instead of specifying
+  the username/password/host directly in the config file.
++ config paramater 'dbhost' is now also used for the backup filename. If you
+  use the new 'defaults-extra-file' for remote backups, this key is still needed
+  to set the filename!
+- code formatting and minor fixes
+
+version 0.6 (Mar 2006)
+----------------------
++ using a MySQL config file ~/.my.cnf is now the recommended way to hide
+  passwords from the process table
++ new config file parameter "exclude databases" to specify a comma separared
+  list of database that are not to be backed up
+- fixed config file parameter "compression tool" to allow white space
+
+version 0.5 (Mar 2005)
+----------------------
+- worked around an obscure bug in File::Spec->abs2rel()
++ using tilde for home directory expansion is now possible for all configuration values using paths
+
+version 0.4 (Feb 2005)
+----------------------
+- removed the dependancy on DBI for database access
+- added some documentation
+
+version 0.3 (Oct 2004)
+----------------------
+- for recursive directory deletions, try to use File::Path (part of Perl 5.8
+  CORE)
+- fixed date in created filenames (had the wrong month)
+
+version 0.2 (Aug 2004)
+----------------------
++ auto-detection of command line tar/gzip/bzip2 utilities with possible fallback
+  to Archive::Tar (now optional)
++ possibility to specify compression utilities and/or tar paths in config file
++ option for specifying the number of files to keep in backup file rotation
++ improved detection of mysqldump, added -Q option (Quote table and column name
+  with quotes)
+- fixed several typos
+
+version 0.1 (Jun 2004)
+----------------------
++ requires Archive::Tar

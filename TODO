@@ -1,0 +1,10 @@
+This file is a scratch board. It is not a roadmap!
+
+TODO
+- have a systematic (parseable) name for dumps
+- crash safe (can cleanup a previous interupted backup session+give a notice about it)
+- prefer data integrity over speed/space efficiency
+- _should_ not require more modules than the standard perl modules
+- database locking while dumping (cross table integrity!)
+- multiple sections in config file (e.g. multiple backup runs in one run...)
+- anything else?

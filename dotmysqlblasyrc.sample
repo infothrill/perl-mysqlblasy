@@ -1,0 +1,11 @@
+dbusername =  john
+dbpassword = *****
+dbhost = localhost
+backupdir = ~/backups/mysql/
+
+exclude databases = lost+found
+loglevel = 2
+use compression = yes
+use syslog = yes
+keep = 14
+optimize_tables = yes
