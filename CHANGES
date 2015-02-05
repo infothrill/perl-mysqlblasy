@@ -1,3 +1,7 @@
+version 0.10 (unreleased)
+--------------------------
+- Mysql warning and dump Error fixed
+
 version 0.9 (January 2013)
 --------------------------
 o moved code to https://github.com/infothrill/perl-mysqlblasy
