@@ -533,7 +533,7 @@ sub ldb_databases
 		}
 	}
 	push( @cmd, '--silent' );
-	push( @cmd, '--exec', 'SHOW DATABASES' );
+	push( @cmd, '-e', 'SHOW DATABASES' );
 	logDebug(@cmd);
 
 	my $output        = '';
