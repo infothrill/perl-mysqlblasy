@@ -1,6 +1,6 @@
 version 0.10 (unreleased)
 --------------------------
-- Mysql warning and dump Error fixed
+- MySQL --exec deprecated, replaced with --execute
 
 version 0.9 (January 2013)
 --------------------------

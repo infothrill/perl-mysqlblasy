@@ -533,7 +533,7 @@ sub ldb_databases
 		}
 	}
 	push( @cmd, '--silent' );
-	push( @cmd, '-e', 'SHOW DATABASES' );
+	push( @cmd, '--execute', 'SHOW DATABASES' );
 	logDebug(@cmd);
 
 	my $output        = '';
@@ -612,7 +612,7 @@ sub ldb_database_tables
 	# add the database name:
 	push(@cmd, '-D', $database);
 
-	push( @cmd, '--exec', 'SHOW TABLES' );
+	push( @cmd, '--execute', 'SHOW TABLES' );
 	logDebug(@cmd);
 
 	my $output        = '';
@@ -693,7 +693,7 @@ sub myoptimize
 	# add the database name:
 	push(@cmd, '-D', $database);
 
-	push( @cmd, '--exec', "OPTIMIZE TABLE `$table`" );
+	push( @cmd, '--execute', "OPTIMIZE TABLE `$table`" );
 	logDebug(@cmd);
 
 	my $output        = '';
@@ -1924,7 +1924,7 @@ Prints version information and exits.
 
 sub version
 {
-	my $VERSION = '0.8';
+	my $VERSION = '0.10';
 	print $VERSION, "\n";
 	exit 0;
 }
