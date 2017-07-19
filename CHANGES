@@ -1,3 +1,9 @@
+version 0.11 (unreleased)
+--------------------------
++ added option to use MySQL 'login-path' for user and host configuration
++ backup filename uses the 'login-path' name if supplied instead of hostname
+- condensed all database authentication to single function loadDbConfig
+
 version 0.10 (unreleased)
 --------------------------
 - MySQL --exec deprecated, replaced with --execute
