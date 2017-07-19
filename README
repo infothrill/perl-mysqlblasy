@@ -27,8 +27,10 @@ REQUIREMENTS
 
 INSTALL
 -------
-Simply drop the script where you want it to be and create a config file
-(usually $HOME/.mysqlblasyrc)
+Simply drop the script where you want it to be and create a config file at any
+of these locations (/etc/mysqlblasy.conf, /usr/local/etc/mysqlblasy.conf, 
+$HOME/.mysqlblasyrc) or use the --config commandline option to specify a custom
+config file.
 
 NOTE
 ----
