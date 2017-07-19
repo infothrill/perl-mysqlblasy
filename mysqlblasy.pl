@@ -64,6 +64,7 @@ Allowed config keys and values:
    keep                = number of backup files to keep in backupdir
    use syslog          = yes or no or 1 or 0 (default yes)
    tar                 = see below
+   tmpdir              = override system default tmp directory
 
 Some of these configuration values may require special attention:
 'compression tool' and 'tar' can be specified with their absolute filenames or
@@ -806,11 +807,18 @@ File::Spec->tmpdir() for details.
 
 sub tmpDir
 {
-	my $tmpdir = File::Spec->tmpdir();
+	my $tmpdir;
+	if ( my $t = getConfigValue('tmpdir') )
+	{
+		$tmpdir = $t;
+	} else {
+		$tmpdir = File::Spec->tmpdir();
+	}
 	if ( $tmpdir eq File::Spec->curdir() )
 	{
 		logWarn( 'tmpdir fell back to the current directory:', $tmpdir );
 	}
+	logDebug( 'tmpdir: ', $tmpdir );
 	return $tmpdir;
 }
 
@@ -1259,6 +1267,12 @@ sub getPreferences
 				{
 					$cfg->{syslog} = 0;    # false
 				}
+			}
+			elsif (/^tmpdir = (\S+)$/i)
+			{
+
+				#
+				$cfg->{tmpdir} = expand_tilde($1);
 			}
 			else
 			{
@@ -1889,7 +1903,7 @@ Prints version information and exits.
 
 sub version
 {
-	my $VERSION = '0.11';
+	my $VERSION = '0.12';
 	print $VERSION, "\n";
 	exit 0;
 }

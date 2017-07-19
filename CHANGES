@@ -1,3 +1,7 @@
+version 0.12 (unreleased)
+--------------------------
++ added tmpdir option to override system default for temporary files
+
 version 0.11 (unreleased)
 --------------------------
 + added option to use MySQL 'login-path' for user and host configuration
