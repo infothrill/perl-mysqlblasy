@@ -1,6 +1,16 @@
+version 0.12 (unreleased)
+--------------------------
++ added tmpdir option to override system default for temporary files
+
+version 0.11 (unreleased)
+--------------------------
++ added option to use MySQL 'login-path' for user and host configuration
++ backup filename uses the 'login-path' name if supplied instead of hostname
+- condensed all database authentication to single function loadDbConfig
+
 version 0.10 (unreleased)
 --------------------------
-- Mysql warning and dump Error fixed
+- MySQL --exec deprecated, replaced with --execute
 
 version 0.9 (January 2013)
 --------------------------

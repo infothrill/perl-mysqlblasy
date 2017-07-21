@@ -45,6 +45,10 @@ Allowed config keys and values:
    backupdir           = directory for placing the backup
    databases           = comma separated list of db's to backup (default all)
    exclude databases   = comma separated list of db's to NOT backup
+   login-path          = named login-path in the .mylogin.cnf path file in current user's home.
+                         Use this for authentication instead of dbusername/dbpassword or
+                         defaults-extra-file. The backup filename will use the login-path name.
+                         For information see mysql_config_editor(1).
    defaults-extra-file = path to an alternative my.cnf config file
    dbusername          = mysql username (it is recommended  to use defaults-extra-file)
    dbpassword          = password for user (it is recommended  to use defaults-extra-file)
@@ -60,6 +64,7 @@ Allowed config keys and values:
    keep                = number of backup files to keep in backupdir
    use syslog          = yes or no or 1 or 0 (default yes)
    tar                 = see below
+   tmpdir              = override system default tmp directory
 
 Some of these configuration values may require special attention:
 'compression tool' and 'tar' can be specified with their absolute filenames or
@@ -507,33 +512,9 @@ server. It fails on error.
 
 sub ldb_databases
 {
-	my @cmd = ( getConfigValue('mysql') );
-
-	# if a defaults-extra-file was specified, use it!
-	if ( my $defaultsextrafile = getConfigValue('defaultsextrafile') )
-	{
-			push( @cmd, "--defaults-extra-file=$defaultsextrafile" );
-	}
-	else # otherwise, rely on direct username/password/host from cfg:
-	{
-		if ( my $u = getConfigValue('dbusername') )
-		# no user, use current ENV user (mysqldump does that!)
-		{
-			push( @cmd, '--user' );
-			push( @cmd, $u );
-		}
-		if ( my $p = getConfigValue('dbpassword') )
-		{
-			push( @cmd, "--password=$p" );
-		}
-		if ( my $h = getConfigValue('dbhost') )
-		{
-			push( @cmd, '--host' );
-			push( @cmd, $h );
-		}
-	}
+	my @cmd = ( loadDbConfig('mysql') );
 	push( @cmd, '--silent' );
-	push( @cmd, '-e', 'SHOW DATABASES' );
+	push( @cmd, '--execute', 'SHOW DATABASES' );
 	logDebug(@cmd);
 
 	my $output        = '';
@@ -584,35 +565,11 @@ mysql server. It fails on error.
 sub ldb_database_tables
 {
 	my $database = shift || graceful_die("Need parameter 'database'");
-	my @cmd = ( getConfigValue('mysql') );
-
-	# if a defaults-extra-file was specified, use it!
-	if ( my $defaultsextrafile = getConfigValue('defaultsextrafile') )
-	{
-			push( @cmd, "--defaults-extra-file=$defaultsextrafile" );
-	}
-	else # otherwise, rely on direct username/password/host from cfg:
-	{
-		if ( my $u = getConfigValue('dbusername') )
-		# no user, use current ENV user (mysqldump does that!)
-		{
-			push( @cmd, '--user' );
-			push( @cmd, $u );
-		}
-		if ( my $p = getConfigValue('dbpassword') )
-		{
-			push( @cmd, "--password=$p" );
-		}
-		if ( my $h = getConfigValue('dbhost') )
-		{
-			push( @cmd, '--host' );
-			push( @cmd, $h );
-		}
-	}
+	my @cmd = ( loadDbConfig('mysql') );
 	# add the database name:
 	push(@cmd, '-D', $database);
 
-	push( @cmd, '--exec', 'SHOW TABLES' );
+	push( @cmd, '--execute', 'SHOW TABLES' );
 	logDebug(@cmd);
 
 	my $output        = '';
@@ -665,35 +622,11 @@ sub myoptimize
 	my $database = shift || graceful_die("Need parameter 'database'");
 	my $table = shift || graceful_die("Need parameter 'table'");
 
-	my @cmd = ( getConfigValue('mysql') );
-
-	# if a defaults-extra-file was specified, use it!
-	if ( my $defaultsextrafile = getConfigValue('defaultsextrafile') )
-	{
-			push( @cmd, "--defaults-extra-file=$defaultsextrafile" );
-	}
-	else # otherwise, rely on direct username/password/host from cfg:
-	{
-		if ( my $u = getConfigValue('dbusername') )
-		# no user, use current ENV user (mysqldump does that!)
-		{
-			push( @cmd, '--user' );
-			push( @cmd, $u );
-		}
-		if ( my $p = getConfigValue('dbpassword') )
-		{
-			push( @cmd, "--password=$p" );
-		}
-		if ( my $h = getConfigValue('dbhost') )
-		{
-			push( @cmd, '--host' );
-			push( @cmd, $h );
-		}
-	}
+	my @cmd = ( loadDbConfig('mysql') );
 	# add the database name:
 	push(@cmd, '-D', $database);
 
-	push( @cmd, '--exec', "OPTIMIZE TABLE `$table`" );
+	push( @cmd, '--execute', "OPTIMIZE TABLE `$table`" );
 	logDebug(@cmd);
 
 	my $output        = '';
@@ -844,15 +777,22 @@ sub _hostname
 	}
 	else
 	{
-		eval { $hostname = Sys::Hostname->hostname(); };
-		if ( my $e = $@ )
-		{    # exception!
-			logWarn($e);
-		}
-		if ( not defined $hostname )
+		if ( my $h = getConfigValue('loginpath') )
 		{
-			logWarn('hostname could not be determined');
-			$hostname = '';
+			$hostname = $h;
+		}
+		else
+		{
+			eval { $hostname = Sys::Hostname->hostname(); };
+			if ( my $e = $@ )
+			{    # exception!
+				logWarn($e);
+			}
+			if ( not defined $hostname )
+			{
+				logWarn('hostname could not be determined');
+				$hostname = '';
+			}
 		}
 	}
 	return $hostname;
@@ -867,11 +807,18 @@ File::Spec->tmpdir() for details.
 
 sub tmpDir
 {
-	my $tmpdir = File::Spec->tmpdir();
+	my $tmpdir;
+	if ( my $t = getConfigValue('tmpdir') )
+	{
+		$tmpdir = $t;
+	} else {
+		$tmpdir = File::Spec->tmpdir();
+	}
 	if ( $tmpdir eq File::Spec->curdir() )
 	{
 		logWarn( 'tmpdir fell back to the current directory:', $tmpdir );
 	}
+	logDebug( 'tmpdir: ', $tmpdir );
 	return $tmpdir;
 }
 
@@ -1235,6 +1182,12 @@ sub getPreferences
 				#
 				$cfg->{mysql} = expand_tilde($1);
 			}
+			elsif (/^login-path = (\S+)$/i)
+			{
+
+				#
+				$cfg->{loginpath} = expand_tilde($1);
+			}
 			elsif (/^defaults-extra-file = (\S+)$/i)
 			{
 
@@ -1314,6 +1267,12 @@ sub getPreferences
 				{
 					$cfg->{syslog} = 0;    # false
 				}
+			}
+			elsif (/^tmpdir = (\S+)$/i)
+			{
+
+				#
+				$cfg->{tmpdir} = expand_tilde($1);
 			}
 			else
 			{
@@ -1414,31 +1373,7 @@ sub mydump
 		graceful_die('you need to give me the filename!!');
 	}
 
-	my @cmd = ( getConfigValue('mysqldump') );
-
-	# if a defaults-extra-file was specified, use it!
-	if ( my $defaultsextrafile = getConfigValue('defaultsextrafile') )
-	{
-			push( @cmd, "--defaults-extra-file=$defaultsextrafile" );
-	}
-	else # otherwise, rely on direct username/password/host from cfg:
-	{
-		if ( my $u = getConfigValue('dbusername') )
-		{
-			push( @cmd, '--user' );
-			push( @cmd, $u );
-		}
-		;    # if no user, my.cnf is used by the mysql tools
-		if ( my $p = getConfigValue('dbpassword') )
-		{
-			push( @cmd, "--password=$p" );
-		}
-		if ( my $h = getConfigValue('dbhost') )
-		{
-			push( @cmd, '--host' );
-			push( @cmd, $h );
-		}
-	}
+	my @cmd = ( loadDbConfig('mysqldump') );
 
 	push( @cmd,
 		'--lock-tables', '--complete-insert', '--add-drop-table',
@@ -1916,6 +1851,50 @@ sub purgeOldFiles
 	return 1;
 }
 
+=item loadDbConfig
+
+Loads Database configuration and return authentication string
+
+=cut
+
+sub loadDbConfig
+{
+	my $config = shift;
+	my @cmd = ( getConfigValue($config) );
+
+	# if a login-path was specified, use it!
+	if ( my $loginpath = getConfigValue('loginpath') )
+	{
+			push( @cmd, "--login-path=$loginpath" );
+	}
+	else # if a defaults-extra-file was specified, use it!
+	{
+		if ( my $defaultsextrafile = getConfigValue('defaultsextrafile') )
+		{
+			push( @cmd, "--defaults-extra-file=$defaultsextrafile" );
+		}
+		else # otherwise, rely on direct username/password/host from cfg:
+		{
+			if ( my $u = getConfigValue('dbusername') )
+			# no user, use current ENV user (mysqldump does that!)
+			{
+				push( @cmd, '--user' );
+				push( @cmd, $u );
+			}
+			if ( my $p = getConfigValue('dbpassword') )
+			{
+				push( @cmd, "--password=$p" );
+			}
+			if ( my $h = getConfigValue('dbhost') )
+			{
+				push( @cmd, '--host' );
+				push( @cmd, $h );
+			}
+		}
+	}
+	return @cmd;
+}
+
 =item version
 
 Prints version information and exits.
@@ -1924,7 +1903,7 @@ Prints version information and exits.
 
 sub version
 {
-	my $VERSION = '0.8';
+	my $VERSION = '0.12';
 	print $VERSION, "\n";
 	exit 0;
 }
