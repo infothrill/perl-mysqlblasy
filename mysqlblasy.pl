@@ -819,6 +819,34 @@ sub tmpDir
 		logWarn( 'tmpdir fell back to the current directory:', $tmpdir );
 	}
 	logDebug( 'tmpdir: ', $tmpdir );
+	# Must be a directory.
+	unless ( -d $tmpdir )
+	{
+		logErr( -e _ ? "$tmpdir: not a directory" : "$tmpdir: not existing" );
+		exit 2;
+	}
+
+	# We need write access since we are going to delete files.
+	unless ( -w _ )
+	{
+		logErr("$tmpdir: no write access");
+		exit 2;
+	}
+
+	# We need read acces since we are going to ge the file list.
+	unless ( -r _ )
+	{
+		logErr("$tmpdir: no read access");
+		exit 2;
+	}
+
+	# Probably need this as well, don't know.
+	unless ( -x _ )
+	{
+		logErr("$tmpdir: no access");
+		exit 2;
+	}
+
 	return $tmpdir;
 }
 
