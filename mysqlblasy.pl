@@ -1377,7 +1377,7 @@ sub mydump
 
 	push( @cmd,
 		'--lock-tables', '--complete-insert', '--add-drop-table',
-		'--quick',       '--quote-names' );
+		'--quick',       '--quote-names',     '--routines' );
 
 	if ( defined $param->{all} && not defined $param->{db} )
 	{
