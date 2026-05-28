@@ -683,7 +683,7 @@ sub _system
 	my $cmd = shift;    # array ref with system() parameters
 	my $out = shift;    # target for stdout
 
-	if ( !ref($cmd) =~ /ARRAY/ )
+	if ( ref($cmd) !~ /ARRAY/ )
 	{
 		graceful_die("Parameter is not an array reference in _system()");
 	}
@@ -1333,7 +1333,7 @@ sub fuFile
 	my $file   = shift || graceful_die("No file specified");
 	my $buffer = shift || graceful_die("No buffer specified");
 
-	if ( !ref($buffer) =~ /^SCALAR$/ )
+	if ( ref($buffer) !~ /^SCALAR$/ )
 	{
 		graceful_die("Specified buffer is not a scalar reference!");
 	}
@@ -1382,7 +1382,7 @@ sub mydump
 
 	logDebug(1);
 
-	if ( !ref($msg) =~ /^SCALAR$/ )
+	if ( ref($msg) !~ /^SCALAR$/ )
 	{
 		graceful_die("Specified msg-buffer is not a scalar reference!");
 	}
