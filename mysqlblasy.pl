@@ -1631,6 +1631,10 @@ sub makeExternalTar
 		{
 			$tarfilename .= ".bz2";
 		}
+		elsif ( $compresstool =~ /zstd$/ )
+		{
+			$tarfilename .= ".zst";
+		}
 	}
 
 	my @cmd = ( $tar, @ccmd, '-cf', $tarfilename, $s );
